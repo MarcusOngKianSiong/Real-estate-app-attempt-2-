@@ -22,7 +22,7 @@ export default function Login(){
             navigate('/controlpanel')
         }
     }
-
+    
     const [formData,setFormData] = useState({
         email: '',
         password: ''
@@ -36,12 +36,13 @@ export default function Login(){
     }
 
     const handleSubmit = () => {
-        fetch('http://localhost:3005/login')
+        fetch(`https://back-end-real-estate-2.herokuapp.com/login/login?email=${formData.email}&password=${formData.password}`,{method: 'post'})
         .then(res=>{
-            return res.json()
+            return res.json();
         })
         .then(res=>{
             if(res.outcome){
+                console.log(res)
                 sessionStorage.setItem('token',res.token)
                 navigate('/controlpanel')
             }else{
@@ -60,7 +61,7 @@ export default function Login(){
     return(
         <div>
             <NavBar/>
-            <Form>
+            <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3" controlId="formBasicEmail">
                     <Form.Label>Email address</Form.Label>
                     <Form.Control type="email" placeholder="Enter email" value={formData.email} onChange={handleChange}/>
@@ -73,9 +74,7 @@ export default function Login(){
                     <Form.Label>Password</Form.Label>
                     <Form.Control type="password" placeholder="Password" value={formData.password} onChange={handleChange}/>
                 </Form.Group>
-                <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                    <Form.Check type="checkbox" label="Check me out" />
-                </Form.Group>
+                
                 <Button variant="primary" type="button" onClick={handleSubmit}>
                     Submit
                 </Button>

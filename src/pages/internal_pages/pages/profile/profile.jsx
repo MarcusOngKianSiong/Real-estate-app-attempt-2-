@@ -20,7 +20,7 @@ export default function Profile(){
         email: "",
         contact: ""
     })
-
+    
     const loadData = () => {
         const token = sessionStorage.getItem('token')
         fetch(`http://localhost:3005/profiledata?token=${token}`)
