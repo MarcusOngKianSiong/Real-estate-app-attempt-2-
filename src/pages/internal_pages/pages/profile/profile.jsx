@@ -22,39 +22,40 @@ export default function Profile(){
     })
     
     const loadData = () => {
-        const token = sessionStorage.getItem('token')
-        fetch(`http://localhost:3005/profiledata?token=${token}`)
+        console.log("LOADING DATA...");
+        const token = sessionStorage.getItem('token');
+        fetch(`https://back-end-real-estate-2.herokuapp.com/profile/getProfile?token=${token}`)
         .then(res=>{
-            return res.json()
+            return res.json();
         })
         .then(res=>{
+            console.log('HERE: ',res);
             if(res.outcome){
-                console.log(res)
-                setFormData(res.data)
+                console.log(res);
+                setFormData(res.profileData);
             }
         })
     }
 
     const cancelEdit = () => {
-        setEditPlatform(null)
+        setEditPlatform(null);
     }
 
     const saveChangesToData = (fieldName,newData) => {
-        const token = sessionStorage.getItem('token')
-        fetch(`http://localhost:3005/changeProfileData?token=${token}&fieldName=${fieldName}&newData=${newData}`,{method: 'post'})
+        
+        const token = sessionStorage.getItem('token');
+        fetch(`https://back-end-real-estate-2.herokuapp.com/profile/editProfileData?token=${token}&fieldName=${fieldName}&data=${newData}`,{method: 'post'})
         .then(res=>{
-            return res.json()
+            return res.json();
         })
         .then(res=>{
             if(res.outcome){
-                loadData()
-                cancelEdit()
+                loadData();
+                cancelEdit();
             }
         })
     }
-
     
-
     const editData = (fieldName,fieldData) => {
         if(fieldName === "editProfilePicture"){
             setEditPlatform(<EditProfilePicture fieldName={fieldName} currentValue={fieldData} saveChange={saveChangesToData} back={cancelEdit}/>)
@@ -68,7 +69,7 @@ export default function Profile(){
     useEffect(()=>{
         if(sessionStorage.getItem("token")){
             // get all the data
-            loadData()
+            loadData(); 
         }else{
             navigate('/login')
         }
