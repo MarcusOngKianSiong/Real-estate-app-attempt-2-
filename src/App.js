@@ -5,7 +5,11 @@ import NavBar from './pages/assets/navbar';
 import Login from './pages/external_pages/login';
 import FrontPage from './pages/external_pages/front-page';
 import ControlPanel from './pages/internal_pages/controlPanel';
-import Profile from './pages/internal_pages/pages/profile/profile'
+import Profile from './pages/internal_pages/pages/profile/profile';
+import YourHome from './pages/internal_pages/pages/yourHome/yourHome';
+import SavedHomes from './pages/internal_pages/pages/savedHomes/savedHomes';
+import SavedSearches from './pages/internal_pages/pages/savedSearches/savedSearches';
+
 
 import {
   createBrowserRouter,
@@ -50,7 +54,17 @@ const router = createBrowserRouter([
   {
     path: "/profile",
     element: <Profile/>,
+  },{
+    path: "/yourhome",
+    element: <YourHome/>
+  },{
+    path: "/savedhomes",
+    element: <SavedHomes/>
+  },{
+    path: "/savedsearches",
+    element: <SavedSearches/>
   }
+
 ]);
 
 

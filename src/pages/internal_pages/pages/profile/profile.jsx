@@ -13,7 +13,7 @@ export default function Profile(){
     const navigate = useNavigate()
 
     const [editPlatform,setEditPlatform] = useState(null)
-
+    
     const [formData,setFormData] = useState({
         profile_picture_path: "",
         profile_picture_id: "",

@@ -7,7 +7,7 @@ import {
     Route,
     Link,
     useNavigate
-  } from "react-router-dom";
+} from "react-router-dom";
 
 
 export default function NavBar(){
@@ -20,11 +20,10 @@ export default function NavBar(){
     
     return(
         <div>
-            <Link to={"/"} className="m-2">Saved homes</Link>
-            <Link to="/" className="m-2">Saved searches</Link>
-            <Link to="/" className="m-2">Your home</Link>
+            <Link to={"/savedhomes"} className="m-2">Saved homes</Link>
+            <Link to="/savedsearches" className="m-2">Saved searches</Link>
+            <Link to="/yourhome" className="m-2">Your home</Link>
             <Link to="/profile" className="m-2">Profile</Link>
-            
         </div>    
     );
 }
