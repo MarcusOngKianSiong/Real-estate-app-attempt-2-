@@ -7,6 +7,7 @@ import EditProfilePicture from './editProfilePicture'
 import TextComponent from './components/textComponents'
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import { keyboardImplementationWrapper } from "@testing-library/user-event/dist/keyboard";
 
 export default function Profile(){
     
@@ -15,7 +16,8 @@ export default function Profile(){
     const [editPlatform,setEditPlatform] = useState(null)
 
     const [formData,setFormData] = useState({
-        profilePicture: "",
+        profile_picture_id: "",
+        profile_picture_path: "",
         name: "",
         email: "",
         contact: ""
@@ -32,7 +34,8 @@ export default function Profile(){
             console.log('HERE: ',res);
             if(res.outcome){
                 console.log(res);
-                setFormData(res.profileData);
+                setFormData(res.profileData)
+                
             }
         })
     }
@@ -56,14 +59,36 @@ export default function Profile(){
         })
     }
     
+    const saveProfilePictureData = (fileID,filePath) => {
+        console.log("RUNNING FUNCTION...")
+        const token = sessionStorage.getItem('token')
+        // console.log(fileID,filePath)
+        fetch(`https://back-end-real-estate-2.herokuapp.com/profile/changeProfilePicture?token=${token}&fileId=${fileID}&filePath=${filePath}`,{
+            method: 'post'
+        })
+        .then(res=>{
+            console.log("SUCCESSSS")
+            return res.json()
+        })
+        .then(res=>{
+            console.log(res)
+            if(res.outcome){
+                localStorage.setItem('uploaded',"")
+                loadData();
+                cancelEdit();
+            }
+        })
+        .catch(err=>{
+            console.log("ERROR: ",err)
+        })
+    }
+
     const editData = (fieldName,fieldData) => {
         if(fieldName === "editProfilePicture"){
-            setEditPlatform(<EditProfilePicture fieldName={fieldName} currentValue={fieldData} saveChange={saveChangesToData} back={cancelEdit}/>)
+            setEditPlatform(<EditProfilePicture fieldName={fieldName} currentValue={fieldData} saveChange={saveProfilePictureData} back={cancelEdit}/>)
         }else{
             setEditPlatform(<EditPlatform fieldName={fieldName} currentValue={fieldData} saveChange={saveChangesToData} back={cancelEdit}/>)
         }
-
-        
     }
 
     useEffect(()=>{
@@ -79,7 +104,7 @@ export default function Profile(){
         <div>
             {editPlatform}
             <InternalNavBar/>
-            <ProfilePicture value={formData.profilePicture} editData={editData}/>
+            <ProfilePicture value={formData.profile_picture_path} editData={editData}/>
             <Form>
                 <TextComponent fieldName={"Name"} value={formData.name} editData={editData}/>
                 <TextComponent fieldName={"Email"} value={formData.email} editData={editData}/>
