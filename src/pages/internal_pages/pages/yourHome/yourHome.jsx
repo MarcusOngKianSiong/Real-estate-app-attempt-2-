@@ -5,13 +5,15 @@ import Map from './components/map/map'
 import SideBar from './components/sideBar/sideBar'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button'
+import { getOverlayDirection } from "react-bootstrap/esm/helpers";
 
 export default function YourHomes(){
-    
+
     const [properties,setProperties] = useState([<Card location={"Something"}/>])
     
     const getPersonalPropertyData = () => {
         // fetch property data
+        
     }
 
     useEffect(()=>{
