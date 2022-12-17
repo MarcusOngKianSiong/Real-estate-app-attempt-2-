@@ -3,6 +3,8 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import 'bootstrap/dist/css/bootstrap.min.css'; 
 import NavBar from "../assets/navbar";
+import { loginLink } from "../../src/links";
+
 
 import {
     Outlet,
@@ -36,7 +38,7 @@ export default function Login(){
     }
 
     const handleSubmit = () => {
-        fetch(`https://back-end-real-estate-2.herokuapp.com/login/login?email=${formData.email}&password=${formData.password}`,{method: 'post'})
+        fetch(`${loginLink}?email=${formData.email}&password=${formData.password}`,{method: 'post'})
         .then(res=>{
             return res.json();
         })

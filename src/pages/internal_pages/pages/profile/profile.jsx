@@ -8,6 +8,7 @@ import TextComponent from './components/textComponents'
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { keyboardImplementationWrapper } from "@testing-library/user-event/dist/keyboard";
+import { getProfile,editProfile, changeProfilePicture } from "../../../../src/links";
 
 export default function Profile(){
     
@@ -16,13 +17,8 @@ export default function Profile(){
     const [editPlatform,setEditPlatform] = useState(null)
     
     const [formData,setFormData] = useState({
-<<<<<<< HEAD
         profile_picture_id: "",
         profile_picture_path: "",
-=======
-        profile_picture_path: "",
-        profile_picture_id: "",
->>>>>>> 5c71fb210ef8eeb2f4ad51a2525e44619e3ff6b4
         name: "",
         email: "",
         contact: ""
@@ -31,7 +27,7 @@ export default function Profile(){
     const loadData = () => {
         console.log("LOADING DATA...");
         const token = sessionStorage.getItem('token');
-        fetch(`https://back-end-real-estate-2.herokuapp.com/profile/getProfile?token=${token}`)
+        fetch(`${getProfile}?token=${token}`)
         .then(res=>{
             return res.json();
         })
@@ -39,8 +35,7 @@ export default function Profile(){
             console.log('HERE: ',res);
             if(res.outcome){
                 console.log(res);
-                setFormData(res.profileData)
-                
+                setFormData(res.profileData);
             }
         })
     }
@@ -52,7 +47,7 @@ export default function Profile(){
     const saveChangesToData = (fieldName,newData) => {
         
         const token = sessionStorage.getItem('token');
-        fetch(`https://back-end-real-estate-2.herokuapp.com/profile/editProfileData?token=${token}&fieldName=${fieldName}&data=${newData}`,{method: 'post'})
+        fetch(`${editProfile}?token=${token}&fieldName=${fieldName}&data=${newData}`,{method: 'post'})
         .then(res=>{
             return res.json();
         })
@@ -64,12 +59,12 @@ export default function Profile(){
         })
     }
     
-<<<<<<< HEAD
     const saveProfilePictureData = (fileID,filePath) => {
         console.log("RUNNING FUNCTION...")
         const token = sessionStorage.getItem('token')
         // console.log(fileID,filePath)
-        fetch(`https://back-end-real-estate-2.herokuapp.com/profile/changeProfilePicture?token=${token}&fileId=${fileID}&filePath=${filePath}`,{
+        console.log("Checking fileid: ",fileID)
+        fetch(`${changeProfilePicture}?token=${token}&fileId=${fileID}&filePath=${filePath}`,{
             method: 'post'
         })
         .then(res=>{
@@ -87,52 +82,10 @@ export default function Profile(){
         .catch(err=>{
             console.log("ERROR: ",err)
         })
-=======
-    const saveProfilePictureData = (newPath) => {
-
-        /*
-            Two goals:
-                1. Delete previous image from imagekit
-                2. Store the new image data into the database
-                3. Refresh everything.
-        */
-        const token = sessionStorage.getItem('token');
-        const fileId = localStorage.getItem('uploaded');
-        const filePath = newPath
-        const previousFileId = formData.profile_picture_id;
-
-        // If there is profile image data, delete image from imageKit
-        if(formData.profile_picture_id && formData.profile_picture_path){
-            fetch(`https://back-end-real-estate-2.herokuapp.com/profile/deleteProfilePicture?token=${token}&fileId=${previousFileId}`)
-            .then(res=>{
-                return res.json()
-            })
-            .then(res=>{
-                if(res.outcome){
-                    console.log("IMAGE KIT IMAGE DELETED....")
-                }
-            })
-        }
-        fetch(`https://back-end-real-estate-2.herokuapp.com/profile/changeProfilePicture?token=${token}&fileId=${fileId}&filePath=${filePath}`,{method: 'post'})
-            .then(res=>{
-                return res.json()
-            })
-            .then(res=>{
-                if(res.outcome){
-                    console.log("Upload succeeded")
-                }
-        })
-        loadData()
-        cancelEdit()
->>>>>>> 5c71fb210ef8eeb2f4ad51a2525e44619e3ff6b4
     }
-
+    
     const editData = (fieldName,fieldData) => {
         if(fieldName === "editProfilePicture"){
-<<<<<<< HEAD
-=======
-            console.log("HERE")
->>>>>>> 5c71fb210ef8eeb2f4ad51a2525e44619e3ff6b4
             setEditPlatform(<EditProfilePicture fieldName={fieldName} currentValue={fieldData} saveChange={saveProfilePictureData} back={cancelEdit}/>)
         }else{
             setEditPlatform(<EditPlatform fieldName={fieldName} currentValue={fieldData} saveChange={saveChangesToData} back={cancelEdit}/>)
@@ -144,10 +97,21 @@ export default function Profile(){
             // get all the data
             loadData(); 
         }else{
-            navigate('/login')
+            navigate('/login');
         }
     },[])
     
+    useEffect(()=>{
+        let imagePath = null
+        let newForm = {...formData}
+        if(formData.profile_picture_path === undefined || formData.profile_picture_path === null || formData.profile_picture_path === ""){
+            imagePath = '"/ENTJ_Male_Rngu9OYs2.jpg"'
+            newForm.profile_picture_path = imagePath;
+            setFormData(newForm)
+            console.log("CHECKING FORM: ",formData)
+        }
+    },[formData])
+
     return(
         <div>
             {editPlatform}
