@@ -14,10 +14,15 @@ export default function Profile(){
     const navigate = useNavigate()
 
     const [editPlatform,setEditPlatform] = useState(null)
-
+    
     const [formData,setFormData] = useState({
+<<<<<<< HEAD
         profile_picture_id: "",
         profile_picture_path: "",
+=======
+        profile_picture_path: "",
+        profile_picture_id: "",
+>>>>>>> 5c71fb210ef8eeb2f4ad51a2525e44619e3ff6b4
         name: "",
         email: "",
         contact: ""
@@ -59,6 +64,7 @@ export default function Profile(){
         })
     }
     
+<<<<<<< HEAD
     const saveProfilePictureData = (fileID,filePath) => {
         console.log("RUNNING FUNCTION...")
         const token = sessionStorage.getItem('token')
@@ -81,16 +87,58 @@ export default function Profile(){
         .catch(err=>{
             console.log("ERROR: ",err)
         })
+=======
+    const saveProfilePictureData = (newPath) => {
+
+        /*
+            Two goals:
+                1. Delete previous image from imagekit
+                2. Store the new image data into the database
+                3. Refresh everything.
+        */
+        const token = sessionStorage.getItem('token');
+        const fileId = localStorage.getItem('uploaded');
+        const filePath = newPath
+        const previousFileId = formData.profile_picture_id;
+
+        // If there is profile image data, delete image from imageKit
+        if(formData.profile_picture_id && formData.profile_picture_path){
+            fetch(`https://back-end-real-estate-2.herokuapp.com/profile/deleteProfilePicture?token=${token}&fileId=${previousFileId}`)
+            .then(res=>{
+                return res.json()
+            })
+            .then(res=>{
+                if(res.outcome){
+                    console.log("IMAGE KIT IMAGE DELETED....")
+                }
+            })
+        }
+        fetch(`https://back-end-real-estate-2.herokuapp.com/profile/changeProfilePicture?token=${token}&fileId=${fileId}&filePath=${filePath}`,{method: 'post'})
+            .then(res=>{
+                return res.json()
+            })
+            .then(res=>{
+                if(res.outcome){
+                    console.log("Upload succeeded")
+                }
+        })
+        loadData()
+        cancelEdit()
+>>>>>>> 5c71fb210ef8eeb2f4ad51a2525e44619e3ff6b4
     }
 
     const editData = (fieldName,fieldData) => {
         if(fieldName === "editProfilePicture"){
+<<<<<<< HEAD
+=======
+            console.log("HERE")
+>>>>>>> 5c71fb210ef8eeb2f4ad51a2525e44619e3ff6b4
             setEditPlatform(<EditProfilePicture fieldName={fieldName} currentValue={fieldData} saveChange={saveProfilePictureData} back={cancelEdit}/>)
         }else{
             setEditPlatform(<EditPlatform fieldName={fieldName} currentValue={fieldData} saveChange={saveChangesToData} back={cancelEdit}/>)
         }
     }
-
+    
     useEffect(()=>{
         if(sessionStorage.getItem("token")){
             // get all the data

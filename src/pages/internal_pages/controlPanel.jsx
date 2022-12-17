@@ -10,7 +10,6 @@ import {
     useNavigate
 } from "react-router-dom";
 
-
 export default function ControlPanel(){
 
     const navigate = useNavigate()
@@ -26,7 +25,7 @@ export default function ControlPanel(){
     }
 
     const loadData = () => {
-
+        
     }
 
     useEffect(()=>{
