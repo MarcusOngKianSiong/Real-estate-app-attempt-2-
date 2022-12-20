@@ -10,20 +10,17 @@ import { gettingCoordinates } from "../../../../src/links";
 import Point from '@arcgis/core/geometry/Point'
 import Graphic from '@arcgis/core/Graphic'
 import { once } from "@arcgis/core/core/reactiveUtils";
+import PropertyDetail from "./components/propertyDetails/propertyDetails";
 
 export default function YourHomes(){
-    
-    
 
     const getCoordinates = async () => {
         const token = sessionStorage.getItem('token')
-    
         const outcome = await fetch(gettingCoordinates+`?token=${token}`)
         .then(res=>{
             return res.json()
         })
         .then(res=>{
-            
             if(res.outcome && res.coordinates.length !== 0){
                 return res.coordinates
                 // setCoordinates(res.coordinates);
@@ -38,69 +35,32 @@ export default function YourHomes(){
 
     const [coordinates,setCoordinates] = useState([]);
     const [properties,setProperties] = useState([]);
-    
-    // const createPoints = () => {
-        
-    //     const allPoints = [];
-    //     // TEMPLATES
-    //     const simpleMarkerSymbol = {
-    //         type: "simple-marker",
-    //         color: [226, 119, 40],  // Orange
-    //         outline: {
-    //             color: [255, 255, 255], // White
-    //             width: 1
-    //         }
-    //      };
-    //     const attributes = {
-    //         latitude: null,
-    //         longitude: null,
-    //         address: null
-    //     }
-    //     const popupTemplate = {
-    //         // ATTACHES POPUP TO GRAPHIC
-    //         title: "Latitude: {latitude}, Longitude: {longitude}",
-    //         content: "{address}"
-    //     }
-        
-    //     coordinates.forEach(pointer=>{
-    //         const point = { //Create a point
-    //             id: 'popup',
-    //             type: "point",
-    //             longitude: pointer.longitude,
-    //             latitude: pointer.latitude
-    //          };
-    //          attributes.latitude = pointer.latitude;
-    //          attributes.longitude = pointer.longitude;
-             
-    //          const pointGraphic = new Graphic({
-    //             // GRAPHIC CHARACTERISTICS
-    //             geometry: point,
-    //             symbol: simpleMarkerSymbol,
-                
-    //             // ATTACHES POPUP TO GRAPHIC
-    //             attributes: attributes,
-    //             popupTemplate: popupTemplate
-    //          });
-    //          allPoints.push(pointGraphic)
-    //     })
-        
-    //     setPointers(allPoints)
-    // }
+    const [propertyDetails,setPropertyDetails] = useState(null)
+
+    const closePropertyDetail = () => {
+        console.log("CLOSING DETAILS....")
+        setPropertyDetails(null)
+    }
+
+    const openPropertyDetails = (address,coordinate) => {
+        console.log("OPENING DETAILS....")
+        setPropertyDetails(<PropertyDetail close={closePropertyDetail} address={address} coordinate={coordinate}/>)
+    }
 
     const createCards = (coordinates) => {
         const cards = []
         coordinates.forEach(coordinate=>{
-            cards.push(<Card location={coordinate} />)
+            cards.push(<Card location={coordinate} openPropertyDetails={openPropertyDetails}/>)
         })
         setProperties(cards)
     }
-
-    
     
     const getPersonalPropertyData = () => {
         // fetch property data
         
     }
+
+    
 
     useEffect(()=>{
         getCoordinates()
@@ -113,6 +73,7 @@ export default function YourHomes(){
     return(
         <div>
             <InternalNavBar/>
+            {propertyDetails}
             <div className="d-flex " style={{width: '100vw',height: '100vh'}}>
                 <Map getCoordinates={getCoordinates}/>
                 <div id="cards" >

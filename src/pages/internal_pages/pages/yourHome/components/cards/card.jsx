@@ -33,7 +33,7 @@ export default function Cards(prop){
     return(
         <div className="m-3">
             
-            <Card style={{ width: '18rem' }}>
+            <Card style={{ width: '18rem' }} onClick={()=>{prop.openPropertyDetails(address,prop.location)}}>
                 <Card.Img variant="top" src="holder.js/100px180" />
                 <Card.Body>
                     <Card.Title>Card Title</Card.Title>
