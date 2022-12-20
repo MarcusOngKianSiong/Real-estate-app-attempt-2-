@@ -8,7 +8,7 @@ import Point from '@arcgis/core/geometry/Point'
 export default function Cards(prop){
 
     const [address,setAddress] = useState(null)
-
+    
     const getAddress = () => {
         const coordinate = prop.location;
         const serviceUrl = "http://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer";

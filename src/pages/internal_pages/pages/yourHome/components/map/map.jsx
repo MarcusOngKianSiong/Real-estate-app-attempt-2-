@@ -29,6 +29,15 @@ const simpleMarkerSymbol = {
     longitude: null,
     latitude: null
  };
+ const attributeTemplate = {
+            latitude: null,
+            longitude: null,
+            address: null
+ }
+ const popupTemplate = {
+        title: "Latitude: {latitude}, Longitude: {longitude}",
+        content: "{address}"
+ }
 
 const MyMap=(variables)=>{
 
@@ -38,21 +47,44 @@ const MyMap=(variables)=>{
     console.log("MAP; CHECKING COORDINATES: ",variables.coordinates)
     // const search = new Search();
 
+    const getAddress = async (coordinate) => {
+        const serviceUrl = "http://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer";
+        const pointer = new Point(coordinate.longitude,coordinate.latitude);
+        const params = {
+            location: pointer
+        }
+        return await Locator.locationToAddress(serviceUrl,params)
+        .then(res=>{
+            return res.address
+        })
+        .catch(err=>{
+            return err.message
+        })
+    }
+
     const createPoints = (coordinates) => {
         
         const points = []
         if(coordinates.length !== 0){
             coordinates.forEach(coordinate => {
-                const point = {...pointTemplate};
-                point.latitude = coordinate.latitude;
-                point.longitude = coordinate.longitude;
-                points.push(
-                    new Graphic({
-                        // GRAPHIC CHARACTERISTICS
-                        geometry: point,
-                        symbol: simpleMarkerSymbol,
-                    })
-                )
+                
+                    
+                    const point = {...pointTemplate};
+                    point.latitude = coordinate.latitude;
+                    point.longitude = coordinate.longitude;
+                    
+                    points.push(
+                        new Graphic({
+                            // GRAPHIC CHARACTERISTICS
+                            geometry: point,
+                            symbol: simpleMarkerSymbol,
+    
+                            
+                        })
+                    )
+                    
+                
+                
             });
         }
         return points;
@@ -74,10 +106,23 @@ const MyMap=(variables)=>{
         
         variables.getCoordinates()
         .then(coordinates=>{
+            
             const points = createPoints(coordinates)
             console.log("MAP; CHECKING POINT GRAPHIC: ",points)
             points.forEach(point=>{
-                view.graphics.add(point)
+                const attribute = {...attributeTemplate}
+                const popup = {...popupTemplate}
+                console.log("CHECKING GEOMETRY: ",point.geometry.latitude)
+                getAddress({latitude: point.geometry.latitude, longitude: point.geometry.longitude})
+                .then(address=>{
+                    attribute.latitude = point.geometry.latitude;
+                    attribute.longitude = point.geometry.longitude;
+                    attribute.address = address
+                    point.attributes = attribute;
+                    point.popupTemplate = popup;
+                    view.graphics.add(point)
+                })
+                
             })
         })
         .catch(err=>{
