@@ -14,183 +14,90 @@ import * as Locator from '@arcgis/core/rest/locator'
 import Point from '@arcgis/core/geometry/Point'
 import { useState } from 'react';
 import { once } from '@arcgis/core/core/reactiveUtils';
+import { resolvePath } from 'react-router-dom';
+
+const simpleMarkerSymbol = {
+    type: "simple-marker",
+    color: [226, 119, 40],  // Orange
+    outline: {
+        color: [255, 255, 255], // White
+        width: 1
+    }
+ };
+ const pointTemplate = { //Create a point
+    type: "point",
+    longitude: null,
+    latitude: null
+ };
 
 const MyMap=(variables)=>{
 
-    console.log("Checking pointers in map: ",variables.pointers)
-
-    console.log("Checking variables step 1: ",variables.coordinates)
     const mapRef = useRef(null);
     esriConfig.apiKey = "AAPK768fe6b6477e4c81920d51bae919e383LUfFQpe4GPvEL-NUgn1mQbgZvZHPZvBJIr_s-QYaShYERbooVbNGaWTOiCt0jXta"  // I need a key
-    
-    const [allPointers,setPoints] = useState(null)
 
-    const map = new Map({
-        basemap: "arcgis-navigation"
-    })
+    console.log("MAP; CHECKING COORDINATES: ",variables.coordinates)
+    // const search = new Search();
 
-    const view = new MapView({
-        container: mapRef.current,          
-        map: map,
-        center: [103.851959,1.290270],
-        zoom: 12,
-    })
-
-    const search = new Search();
-    
-    const getCoordinates = () => {
-        console.log("GETTING COORDINATES!!!!")
-        search.on('search-complete',(result)=>{
-          const geom = result.results[0].results[0].feature.geometry;
-          const longitude = geom.longitude;
-          const latitude = geom.latitude;
-          const address = result.searchTerm;
-          variables.setAddressData(address,latitude,longitude)
-          variables.changeLocationDataDisplay({
-            address: address,
-            lantitude: latitude,
-            longitude: longitude
-          })
-        })
-    }
-    
-    const handleClick = (event) => {
-        const element = event.target.className;
-        console.log(event)
-        if(element === "esri-icon-search" || element === "esri-menu__list-item"){
-          getCoordinates()
-        }
-    }
-    
-    const handleKeyDown = (event) => {
-        if(event.code === "Enter"){
-            getCoordinates()
-        }
-    }
-    
-    const createPoints = () => {
-        console.log("CHECKING COORDINATES WHEN CREATING POIINTS: ",variables.coordinates)
-        const allPoints = [];
-        // TEMPLATES
-        const simpleMarkerSymbol = {
-            type: "simple-marker",
-            color: [226, 119, 40],  // Orange
-            outline: {
-                color: [255, 255, 255], // White
-                width: 1
-            }
-         };
-        const attributes = {
-            latitude: null,
-            longitude: null,
-            address: null
-        }
-        const popupTemplate = {
-            // ATTACHES POPUP TO GRAPHIC
-            title: "Latitude: {latitude}, Longitude: {longitude}",
-            content: "{address}"
-        }
+    const createPoints = (coordinates) => {
         
-        variables.coordinates.forEach(pointer=>{
-            const point = { //Create a point
-                id: 'popup',
-                type: "point",
-                longitude: pointer.longitude,
-                latitude: pointer.latitude
-             };
-             attributes.latitude = point.latitude;
-             attributes.longitude = point.longitude;
-             
-             const pointGraphic = new Graphic({
-                // GRAPHIC CHARACTERISTICS
-                geometry: point,
-                symbol: simpleMarkerSymbol,
-                
-                // ATTACHES POPUP TO GRAPHIC
-                attributes: attributes,
-                popupTemplate: popupTemplate
-             });
-             allPoints.push(pointGraphic)
-        })
-        console.log(allPoints)
-        setPoints(allPoints)
+        const points = []
+        if(coordinates.length !== 0){
+            coordinates.forEach(coordinate => {
+                const point = {...pointTemplate};
+                point.latitude = coordinate.latitude;
+                point.longitude = coordinate.longitude;
+                points.push(
+                    new Graphic({
+                        // GRAPHIC CHARACTERISTICS
+                        geometry: point,
+                        symbol: simpleMarkerSymbol,
+                    })
+                )
+            });
+        }
+        return points;
     }
 
     useEffect(()=>{
     
-        // BASE MAP
-
-        
-       
-    
-        //SEARCH FEATURE
-        // How do you even attach the search onto the map by default?
-        // search.view = view;
-
-        // view.ui.add(search,{
-        //     position: "top-left",
-        //     index: 2
-        // })
-        
-        // POINTS ON THE MAP
-
-
-        
-         const template = {
-            title: 'something',
-            content: 'nothing'
-         }
-
-        // A grouping of specific elements on the map
-        // const layer = new FeatureLayer({
-            
-        //     // -------WHAT ELEMENTS TO TARGET?------ 
-        //     // This represents what type of element is being grouped into this layer
-        //     source: view.graphics, 
-        //     // This represents what specific element is being targeted within the type of element
-        //     geometryType: 'point',
-        //     // this is the structure of the things inside the popup. ** not fields, data collected cannot be displayed. 
-        
-        //     // --------WHAT DO YOU WANT THE SPECIFIC ELEMENTS INSIDE THIS LAYER TO SHOW?--------
-        //     // This is to show the popup + collect the data to be displayed in the popup. 
-        //     popupTemplate: template,
-
-        //     // ---------WHAT IS THE STRUCTURE BEHIND WHAT YOU WANT TO SHOW?-------
-        //     // Given it is a popup, this structure represents the content inside. 
-        //     fields: [{
-        //         name: "ObjectID",
-        //         alias: "ObjectID",
-        //         type: "oid"
-        //       }, {
-        //         name: "place",
-        //         alias: "Place",
-        //         type: "string"
-        //       }],
-            
-        // })
-
-        // map.add(layer)
-        
-        view.on('click','popup',(e)=>{
-            console.log(e)
+        const map = new Map({
+            basemap: "arcgis-navigation"
         })
+    
+        const view = new MapView({
+            container: mapRef.current,          
+            map: map,
+            center: [103.851959,1.290270],
+            zoom: 12,
+        })
+        // BASE MAP
+        
+        variables.getCoordinates()
+        .then(coordinates=>{
+            const points = createPoints(coordinates)
+            console.log("MAP; CHECKING POINT GRAPHIC: ",points)
+            points.forEach(point=>{
+                view.graphics.add(point)
+            })
+        })
+        .catch(err=>{
+            console.log(err)
+        })
+
+        
+        
+        
+        // view.on('click','popup',(e)=>{
+        //     console.log(e)
+        // })
 
         
 
     },[])
-    
-
-    // useEffect(()=>{
-    //     // createPoints()
-    //     // console.log("Checking all pointers state: ",allPointers)
-    //     // allPointers.forEach(pointing=>{
-    //     //     view.graphics.add(pointing)
-    //     // })
-    // },[allPointers])
 
     return (
         
-            <div ref={mapRef} onClick={(event)=>{handleClick(event)}} onKeyDown={(event)=>{handleKeyDown(event)}} style={{width: '100%', height: '100%'}}/>
+            <div ref={mapRef} style={{width: '100%', height: '100%'}}/>
         
     )
     
