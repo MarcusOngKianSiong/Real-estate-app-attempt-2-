@@ -13,13 +13,28 @@ import { keyboardImplementationWrapper } from '@testing-library/user-event/dist/
 import * as Locator from '@arcgis/core/rest/locator'
 import Point from '@arcgis/core/geometry/Point'
 import { useState } from 'react';
+import { once } from '@arcgis/core/core/reactiveUtils';
 
 const MyMap=(variables)=>{
-    
+
+    console.log("Checking pointers in map: ",variables.pointers)
+
+    console.log("Checking variables step 1: ",variables.coordinates)
     const mapRef = useRef(null);
     esriConfig.apiKey = "AAPK768fe6b6477e4c81920d51bae919e383LUfFQpe4GPvEL-NUgn1mQbgZvZHPZvBJIr_s-QYaShYERbooVbNGaWTOiCt0jXta"  // I need a key
     
-    const [address,setAddress] = useState(null)
+    const [allPointers,setPoints] = useState(null)
+
+    const map = new Map({
+        basemap: "arcgis-navigation"
+    })
+
+    const view = new MapView({
+        container: mapRef.current,          
+        map: map,
+        center: [103.851959,1.290270],
+        zoom: 12,
+    })
 
     const search = new Search();
     
@@ -53,13 +68,10 @@ const MyMap=(variables)=>{
         }
     }
     
-
-
-
-
     const createPoints = () => {
-        console.log(variables.coordinates)
-        const allPoints = []
+        console.log("CHECKING COORDINATES WHEN CREATING POIINTS: ",variables.coordinates)
+        const allPoints = [];
+        // TEMPLATES
         const simpleMarkerSymbol = {
             type: "simple-marker",
             color: [226, 119, 40],  // Orange
@@ -74,6 +86,7 @@ const MyMap=(variables)=>{
             address: null
         }
         const popupTemplate = {
+            // ATTACHES POPUP TO GRAPHIC
             title: "Latitude: {latitude}, Longitude: {longitude}",
             content: "{address}"
         }
@@ -89,51 +102,38 @@ const MyMap=(variables)=>{
              attributes.longitude = point.longitude;
              
              const pointGraphic = new Graphic({
+                // GRAPHIC CHARACTERISTICS
                 geometry: point,
                 symbol: simpleMarkerSymbol,
                 
+                // ATTACHES POPUP TO GRAPHIC
                 attributes: attributes,
                 popupTemplate: popupTemplate
              });
              allPoints.push(pointGraphic)
         })
-        return allPoints
+        console.log(allPoints)
+        setPoints(allPoints)
     }
 
     useEffect(()=>{
     
-        const map = new Map({
-            basemap: "arcgis-navigation"
-        })
-        
-        const view = new MapView({
-            container: mapRef.current,          
-            map: map,
-            center: [103.851959,1.290270],
-            zoom: 12,
-        })
-    
-        // How do you even attach the search onto the map by default?
-        search.view = view;
+        // BASE MAP
 
-        view.ui.add(search,{
-            position: "top-left",
-            index: 2
-        })
         
-        const locate = new Locate({
-            view: view,
-            useHeadingEnabled: false,
-            goToOverride: (view,options)=>{
-                options.target.scale = 1500;
-                return view.goTo(options.target);
-            }
-        })
+       
+    
+        //SEARCH FEATURE
+        // How do you even attach the search onto the map by default?
+        // search.view = view;
+
+        // view.ui.add(search,{
+        //     position: "top-left",
+        //     index: 2
+        // })
         
-        const pointList = createPoints() 
-        pointList.forEach(pointing=>{
-            view.graphics.add(pointing)
-        })
+        // POINTS ON THE MAP
+
 
         
          const template = {
@@ -175,10 +175,19 @@ const MyMap=(variables)=>{
             console.log(e)
         })
 
-        view.ui.add(locate, 'top-left');
+        
 
     },[])
     
+
+    // useEffect(()=>{
+    //     // createPoints()
+    //     // console.log("Checking all pointers state: ",allPointers)
+    //     // allPointers.forEach(pointing=>{
+    //     //     view.graphics.add(pointing)
+    //     // })
+    // },[allPointers])
+
     return (
         
             <div ref={mapRef} onClick={(event)=>{handleClick(event)}} onKeyDown={(event)=>{handleKeyDown(event)}} style={{width: '100%', height: '100%'}}/>
