@@ -43,9 +43,7 @@ const MyMap=(variables)=>{
 
     const mapRef = useRef(null);
     esriConfig.apiKey = "AAPK768fe6b6477e4c81920d51bae919e383LUfFQpe4GPvEL-NUgn1mQbgZvZHPZvBJIr_s-QYaShYERbooVbNGaWTOiCt0jXta"  // I need a key
-
     console.log("MAP; CHECKING COORDINATES: ",variables.coordinates)
-    // const search = new Search();
 
     const getAddress = async (coordinate) => {
         const serviceUrl = "http://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer";
@@ -63,50 +61,36 @@ const MyMap=(variables)=>{
     }
 
     const createPoints = (coordinates) => {
-        
         const points = []
         if(coordinates.length !== 0){
-            coordinates.forEach(coordinate => {
-                
-                    
+            coordinates.forEach(coordinate => {   
                     const point = {...pointTemplate};
                     point.latitude = coordinate.latitude;
                     point.longitude = coordinate.longitude;
-                    
                     points.push(
                         new Graphic({
                             // GRAPHIC CHARACTERISTICS
                             geometry: point,
                             symbol: simpleMarkerSymbol,
-    
-                            
                         })
                     )
-                    
-                
-                
             });
         }
         return points;
     }
 
     useEffect(()=>{
-    
         const map = new Map({
             basemap: "arcgis-navigation"
         })
-    
         const view = new MapView({
             container: mapRef.current,          
             map: map,
             center: [103.851959,1.290270],
             zoom: 12,
         })
-        // BASE MAP
-        
         variables.getCoordinates()
         .then(coordinates=>{
-            
             const points = createPoints(coordinates)
             console.log("MAP; CHECKING POINT GRAPHIC: ",points)
             points.forEach(point=>{
@@ -121,23 +105,12 @@ const MyMap=(variables)=>{
                     point.attributes = attribute;
                     point.popupTemplate = popup;
                     view.graphics.add(point)
-                })
-                
+                })    
             })
         })
         .catch(err=>{
             console.log(err)
         })
-
-        
-        
-        
-        // view.on('click','popup',(e)=>{
-        //     console.log(e)
-        // })
-
-        
-
     },[])
 
     return (
