@@ -7,30 +7,50 @@ import Maintainence from "./components/maintainence";
 export default function PropertyInformation(prop){
 
     const [data,setData] = useState({
-        description: "Something about this place makes it seem luxurious..."
+        description: ""
     })
     const [tags,setTags] = useState()
 
-    const getPropertyInformation = () => {
-        const coordinate = prop.coordinate;
-    }
-    
     const createTags = () => {
-        const tags = []
-        const test = [1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,6,2,4,5,2,2,5,3,3];
-        test.forEach(item=>{
-            tags.push(<Tag content={item}/>)
+        if(data.tags){
+            const tags = data.tags.split(",");
+            console.log("THIS: ",tags)
+            
+            const tagElements = []
+            tags.forEach(item=>{
+                tagElements.push(<Tag content={item}/>)
+            })
+            setTags(tagElements);
+        }
+        
+    }
+
+    const getData = () => {
+        const coordinate = prop.coordinate;
+        fetch(`https://470wu2qcw1.execute-api.ap-southeast-1.amazonaws.com/RealEstateApp/yourhomes/get-property-information?latitude=${coordinate.latitude}&longitude=${coordinate.longitude}&token=${sessionStorage.getItem('token')}`)
+        .then(res=>{
+            return res.json()
         })
-        setTags(tags);
+        .then(res=>{
+            if(res.outcome){
+                console.log(res.data[0])
+                setData(res.data[0])
+                
+            }else{
+                console.log(res.reason)
+            }
+
+        })
     }
 
-    const getDescription = () => {
-
-    }
+    
 
     useEffect(()=>{
+        console.log("CHECKING PROPERTY INFOMRATION COORDINATE: ",prop.coordinate)
+        getData()
         createTags()
     },[])
+
 
     return(
         <div className="d-flex flex-column border border-danger w-100 h-100" style={{overflow: 'scroll'}}>
@@ -44,11 +64,11 @@ export default function PropertyInformation(prop){
                 <div>
                     <div className="border border-danger d-flex flex-column">
                         <h3 className="text-start m-2">Price</h3>   
-                        <Price/>
+                        <Price principal={data.principal} downpayment={data.downpayment_percentage} installmentYears={data.installment_duration} installmentInterestRate={data.installment_interest_rate}/>
                     </div>
                     <div className="border border-danger d-flex flex-column">
                         <h3 className="text-start m-2">Maintainence</h3>   
-                        <Maintainence/>
+                        <Maintainence mortgageInsurance={data.mortgage_insurance} principal={data.principal} propertyTaxRate={data.property_tax_rate} homeInsurance={data.home_insurance} hoa={data.hoa}/>
                     </div>
                 </div>
             </div>

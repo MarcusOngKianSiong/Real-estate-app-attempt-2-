@@ -8,23 +8,23 @@ export default function Maintainence(prop){
         <Form>
             <Form.Group className="mb-3" >
                 <Form.Label>Mortgage Insurance</Form.Label>
-                <Form.Control type="mortgageInsurance" value="$1000 per month" />
+                <Form.Control type="mortgageInsurance" value={`$${prop.mortgageInsurance} per month`} />
             </Form.Group>
         
             <Form.Group className="mb-3" >
                 <Form.Label>Property Taxes</Form.Label>
-                <Form.Control type="Principal" value="$1,000,000" />
-                <Form.Control type="propertyTaxRate" value="10%" />
+                <Form.Control type="Property Tax" value={`$${prop.propertyTaxRate/100*prop.principal} per month`} />
+                <Form.Control type="propertyTaxRate" value={`${prop.propertyTaxRate}%`} />
             </Form.Group>
             
             <Form.Group className="mb-3" >
                 <Form.Label>Home insurance</Form.Label>
-                <Form.Control type="homeInsurance" value="$2000 per month" />
+                <Form.Control type="homeInsurance" value={`$${prop.homeInsurance} per month`} />
             </Form.Group>
 
             <Form.Group className="mb-3" >
                 <Form.Label>HOA Fees</Form.Label>
-                <Form.Control type="HOA" value="$200 per month" />
+                <Form.Control type="HOA" value={`$${prop.hoa} per month`} />
             </Form.Group>
 
         </Form>
