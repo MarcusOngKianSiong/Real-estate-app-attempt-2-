@@ -80,6 +80,10 @@ export default function Login(){
                 <Button variant="primary" type="button" onClick={handleSubmit}>
                     Submit
                 </Button>
+
+                <p><strong>Username:</strong> marcus@gmail.com</p>
+                <p><strong>Password:</strong> marcus</p>
+
             </Form>
         </div>
     )
